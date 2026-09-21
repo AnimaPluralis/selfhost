@@ -12,6 +12,9 @@ single scope `read:packages`, which the installer checks with one `docker login`
 downloads anything. The invitation grants access to that image only, not to the source.
 The CUDA model-server image is public and needs no token.
 
+New self-hosters: follow [Run Etho Insights on your own machine](install.md), which walks
+from the invitation to the first Result.
+
 ## Install
 
 ```bash
