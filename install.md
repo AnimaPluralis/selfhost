@@ -85,48 +85,17 @@ A fresh install cannot run models yet. Pick one option in **Settings → Compute
 
 ### 6. Check that it works
 
-This first check needs no compute, so you can run it before step 5.
+This check needs no compute, so you can run it before step 5.
 
-1. Make a two-second test video with the ffmpeg inside the app image. On the machine that
-   hosts Anima Pluralis, go to the install folder (`cd ~/.anima`) and run:
+1. In **Library**, upload a short video of your own, such as a few seconds filmed on your
+   phone with something moving in it. Wait for processing, then play it.
+2. In **Analyzers**, choose **New Analyzer → Blank Analyzer** and name it `Motion check`.
+   Select **Add node**, choose **Signal**, then **Motion**, and keep its settings. Close the
+   settings panel with Esc and select **Save**.
+3. Back in **Library**, select the video and choose **Analyze → Motion check**.
 
-   ```bash
-   APP_IMAGE="$(python3 selfhost_env.py get .env APP_IMAGE)"
-   ( set -o noclobber
-     docker run --rm --pull never --network none --log-driver none --pids-limit 256 \
-       --entrypoint ffmpeg "$APP_IMAGE" -hide_banner -loglevel error \
-       -f lavfi -i 'testsrc2=size=160x120:rate=10' -t 2 -an \
-       -c:v libx264 -pix_fmt yuv420p -movflags frag_keyframe+empty_moov \
-       -f mp4 pipe:1 > selfhost-smoke.mp4
-   )
-   ```
-
-   This writes `selfhost-smoke.mp4`, a moving test pattern with no animals in it. The command
-   never overwrites a file, so if it fails, delete `selfhost-smoke.mp4` before you run it
-   again. If you open Anima from another computer, copy the file there first. Run this in a
-   terminal on that computer: `scp you@your-server:.anima/selfhost-smoke.mp4 .`
-
-2. In **Library**, upload `selfhost-smoke.mp4`, wait for processing, and play it.
-3. In **Analyzers**, choose **New Analyzer → Blank Analyzer** and name it `Motion check`.
-4. Select **Add node**, choose **Signal**, then **Motion**, and leave its settings as they are.
-   Its settings panel opens on the right and covers **Save**. Close the panel with Esc, the ×
-   at its top right, or **Close** at its foot, then select **Save**.
-5. Back in **Library**, select the video, open **Analyze** and choose **Motion check**.
-   Selecting the Analyzer submits the run and opens its Result.
-
-The Result completes within seconds with one **motion** Event, from about 0.5 s to 2.0 s. If
-it failed or is empty, run `anima logs` to see why.
-
-Once compute is connected (step 5), check that models run on the same video:
-
-1. In **Analyzers**, choose **New Analyzer → Species ID**. The template creates the Analyzer
-   ready to run; leave it unchanged.
-2. Back in **Library**, select the video and choose **Analyze → Species ID**.
-
-The first run downloads model weights, so it can take a while. A completed Result with no
-species found is right for this test pattern. A suggested species is a model error on it. If
-the Result failed, run `anima logs` to see why. The full guide, `~/.anima/README.md`, walks
-the same checks under "First Result with generated Media" and adds an export.
+The Result opens and completes within seconds, with a **motion** Event wherever the video
+moves for a second or more. If it fails, run `anima logs` to see why.
 
 ### Everyday commands
 
