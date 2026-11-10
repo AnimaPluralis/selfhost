@@ -27,8 +27,9 @@ After installing, `anima update` installs a newer Release. The full guide is ins
 
 The app image lives on the registry at `registry.animapluralis.org` and needs a login.
 The maintainer issues you a registry username and token; you do not need a GitHub account.
-The installer asks for both once. The model-server and sandbox images are public, and so is
-everything in this repository.
+The installer asks for both once; a host that runs only compute (the model server) needs
+neither. The model-server and sandbox images are public, and so is everything in this
+repository.
 
 To request access, or if your token stops working, write to info@animapluralis.org.
 
