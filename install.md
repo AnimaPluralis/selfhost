@@ -37,7 +37,7 @@ Run this on the machine that will host Anima Pluralis:
 curl -fsSL https://github.com/AnimaPluralis/selfhost/releases/latest/download/install.sh | sh
 ```
 
-The installer asks six questions:
+The installer asks these questions. If you answer `3` to the first one, it asks nothing else.
 
 | Question                    | What to answer                                                                                                                                                                     |
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -48,6 +48,10 @@ The installer asks six questions:
 | Administrator email         | The email you log in with.                                                                                                                                                         |
 | How will you open Anima?    | `1` On this computer. `2` From your own computer, over SSH to this server. `3` From other computers on a private network such as Tailscale. `4` Through your own HTTPS domain.     |
 
+One more question appears only when the Script runner cannot use this machine's Docker, or
+you declined Docker access for it: whether Scripts may run inside the runner's own container. See Script isolation in
+`~/.anima/configuration.md`.
+
 It then installs into `~/.anima` and downloads the app's container images. The first
 download is several GB and can take minutes. Running models on this machine (answer `2` or `3`
 to "What runs on this machine?") adds a model image of over 10 GB. The installer names each
@@ -55,8 +59,9 @@ image as it downloads it and shows Docker's progress. It gives up only when Dock
 progress for 20 minutes. Over SSH, run the installer inside `tmux` or `screen` so a dropped
 connection does not stop it.
 
-The installer then starts everything and prints the login URL and a **one-time administrator
-password**. Save the password now; it is never shown again.
+Before it starts the services, the installer prints the login URL and a **one-time
+administrator password**. Save the password as soon as it appears, before the startup output
+scrolls it out of view. It is never shown again.
 
 ### 4. Log in
 
@@ -74,7 +79,9 @@ Then open <http://localhost:3000>.
 A fresh install cannot run models yet. Pick one option in **Settings → Compute**:
 
 - **Your own Modal account.** Works from any machine, and you pay per use. Connect a Modal
-  workspace with a Service User token. Service Users need a Modal Team or Enterprise plan;
+  workspace with a Service User token. Give the Service User the Contributor role on the
+  Modal Environment Anima should use (usually `main`). With No Access or Viewer, provisioning
+  fails. Service Users need a Modal Team or Enterprise plan;
   Modal bills the plan and compute to that workspace. Your footage passes through that Modal account.
 - **This machine's GPU** (Linux with an NVIDIA GPU). If you answered `2` in step 3, this is
   already set up. To add it later, run `anima compute enable`. Script Nodes and Assistant
