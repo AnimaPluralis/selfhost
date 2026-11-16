@@ -22,12 +22,16 @@ password manager; the installer asks for it once. It does not expire.
   Compute, invitations, HTTPS, and backups were not tested there, so it is not qualified.
   Keep the install folder on the Mac's internal disk.
 - **Not tested yet:** Intel Macs and arm64 Linux hosts.
-- **To run models on this machine:** Linux with an NVIDIA GPU and the NVIDIA Container
-  Toolkit. Without one you connect compute elsewhere (step 5).
-- **To run models natively on a Mac:** Docker Desktop gives the app no access to the Apple
-  GPU, and the installer does not set up Mac compute yet. A model server can run on the same
-  Apple Silicon Mac, outside Docker, from a source checkout of Anima Pluralis with FFmpeg
-  installed. To try it, write to info@animapluralis.org for the macOS model-server guide.
+- **To run models on a Linux machine:** an NVIDIA GPU and the NVIDIA Container Toolkit.
+- **To run models on a Mac:** an Apple Silicon Mac on macOS 14 or later, with Docker Desktop
+  and no other container runtime. Install `uv` and `ffmpeg` first (`brew install uv ffmpeg`),
+  keep 15 GiB of disk free, and use a terminal that does not open using Rosetta. The models
+  then run on macOS itself, beside the app, and only while you are logged in to the Mac.
+  EmbeddingGemma 2 is qualified there. AVEX, SLEAP, DeepLabCut, biodenoising, SAM and
+  NatureLM-audio run but are not qualified. Species ID (SpeciesNet), Perch and the
+  vision-language Describers do not run on a Mac.
+- **On an Intel Mac or on macOS 13 and older** the installer installs the app alone.
+- **Without a GPU on this machine** you connect compute elsewhere (step 5).
 
 ### 3. Install
 
@@ -39,14 +43,14 @@ curl -fsSL https://github.com/AnimaPluralis/selfhost/releases/latest/download/in
 
 The installer asks these questions. If you answer `3` to the first one, it asks nothing else.
 
-| Question                    | What to answer                                                                                                                                                                     |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| What runs on this machine?  | `1` Anima Pluralis. `2` Anima Pluralis with models on this GPU (only offered when an NVIDIA GPU is found). `3` Models only, for an Anima Pluralis on another machine (see step 5). |
-| Registry username and token | The username and token the maintainer sent you (step 1).                                                                                                                           |
-| Organization or lab name    | The name your colleagues see. Press Enter for `My Organization`.                                                                                                                   |
-| Your name                   | Shown on your account.                                                                                                                                                             |
-| Administrator email         | The email you log in with.                                                                                                                                                         |
-| How will you open Anima?    | `1` On this computer. `2` From your own computer, over SSH to this server. `3` From other computers on a private network such as Tailscale. `4` Through your own HTTPS domain.     |
+| Question                    | What to answer                                                                                                                                                                                                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| What runs on this machine?  | `1` Anima Pluralis. `2` Anima Pluralis with models on this GPU (only offered when an NVIDIA GPU is found). `3` Models only, for an Anima Pluralis on another machine (see step 5). On an Apple Silicon Mac, `2` is "Anima Pluralis, and compute on this Mac" and `3` is not offered. |
+| Registry username and token | The username and token the maintainer sent you (step 1).                                                                                                                                                                                                                             |
+| Organization or lab name    | The name your colleagues see. Press Enter for `My Organization`.                                                                                                                                                                                                                     |
+| Your name                   | Shown on your account.                                                                                                                                                                                                                                                               |
+| Administrator email         | The email you log in with.                                                                                                                                                                                                                                                           |
+| How will you open Anima?    | `1` On this computer. `2` From your own computer, over SSH to this server. `3` From other computers on a private network such as Tailscale. `4` Through your own HTTPS domain.                                                                                                       |
 
 One more question appears only when the Script runner cannot use this machine's Docker, or
 you declined Docker access for it: whether Scripts may run inside the runner's own container. See Script isolation in
@@ -59,9 +63,18 @@ image as it downloads it and shows Docker's progress. It gives up only when Dock
 progress for 20 minutes. Over SSH, run the installer inside `tmux` or `screen` so a dropped
 connection does not stop it.
 
+On a Mac, answer `2` downloads no model image. Before it changes anything, the installer
+checks the Mac (step 2) and stops with the fix when something is missing, such as "uv is not
+on PATH. Install it with brew install uv, then retry." After the app runs, it downloads the
+model server, builds it with `uv` (several GB, and a while on a first build) and starts it.
+
 Before it starts the services, the installer prints the login URL and a **one-time
 administrator password**. Save the password as soon as it appears, before the startup output
 scrolls it out of view. It is never shown again.
+
+On a Mac with answer `2`, the last lines say whether compute is ready. When they say
+"Anima Pluralis is installed and running, but Compute on this Mac is not set up yet", the app
+works: fix the cause the installer names, then run `anima compute enable`.
 
 ### 4. Log in
 
@@ -86,7 +99,14 @@ A fresh install cannot run models yet. Pick one option in **Settings → Compute
 - **This machine's GPU** (Linux with an NVIDIA GPU). If you answered `2` in step 3, this is
   already set up. To add it later, run `anima compute enable`. Script Nodes and Assistant
   Analysis do not run on this option.
-- **A GPU on another machine you run.** Run the same install command there and answer `3`.
+- **This Mac** (Apple Silicon, macOS 14 or later; see step 2). If you answered `2` in
+  step 3, this is already set up. To add it later, run `anima compute enable`. The model
+  server starts when you log in to the Mac and stops when you log out. `anima update` updates
+  it with the app, and `anima compute disable` removes it. Script Nodes and Assistant
+  Analysis do not run on this option either. "Compute on a Mac" in `~/.anima/README.md` has
+  every step and what is not supported.
+- **A GPU on another machine you run** (Linux with an NVIDIA GPU; a Mac cannot be that
+  machine). Run the same install command there and answer `3`.
   It skips the other questions. Then run `anima compute pair` on that machine, and paste the
   code it prints into **Compute on another machine** in Settings.
 

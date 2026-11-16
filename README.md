@@ -35,15 +35,18 @@ To request access, or if your token stops working, write to info@animapluralis.o
 
 ## What each Release carries
 
-Every Release has exactly three assets:
+Every Release has exactly four assets:
 
 - `install.sh`: the installer. Run on its own, as in the command above, it downloads
   `release.json` and `selfhost.tar.gz` from the same Release, checks the archive's SHA256
   against `release.json`, and runs the bundled installer.
 - `selfhost.tar.gz`: the installer bundle, with the `anima` command, the Compose files and the
   guides (`README.md`, `configuration.md`, `recovery.md`).
-- `release.json`: the Release's identity: its version, the archive and installer checksums,
-  and the exact image digests it installs.
+- `model-server.tar.gz`: the model server's source, for running the model server on an Apple
+  Silicon Mac without Docker. It holds the server, its shared package and its Extension
+  Packages, all of which the public model-server image also ships.
+- `release.json`: the Release's identity: its version, the checksums of the bundle, the
+  installer and the model server archive, and the exact image digests it installs.
 
 To download and extract the bundle yourself instead of piping the installer to `sh`, use a
 separate download directory:
